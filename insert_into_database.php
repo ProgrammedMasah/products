@@ -1,25 +1,38 @@
 <?php
-
-$title = $_POST['title'];
-$picture = $_POST['picture'];
-$price = $_POST['price'];
-$date = date('d-m-y');
+include './conect_database.php';
 
 if (isset($_POST["save"]))
 {
-    $sql = "INSERT INTO products(title, picture, price, deta) 
-            VALUES('$title', '$picture', '$price', '$date')"; 
 
-    if (empty($title) || empty($picture) || empty($price))
+    $title = $_POST['title'];
+    $price = $_POST['price'];
+    $date = date('y-m-d');
+    
+    $image_name = $_FILES['picture']['name'];
+    $image_tmp_name = ($_FILES['picture']['tmp_name']);
+    
+    $folder = "./img/" . $image_name;
+
+   move_uploaded_file($image_tmp_name, $folder);
+
+    $sql = "INSERT INTO products (title, picture, price, deta) 
+            VALUES('$title', '$folder', '$price', '$date')"; 
+    
+    if (empty($title))
     {
-        echo"Please Enter All the Information";
+        echo "<script> alert('Please Enter the Titl'); </script>";
+    }
+    elseif(empty($price))
+    {
+        echo "<script> alert('Please Enter the Price'); </script>";
     }
     else 
     {
-        if (mysqli_qurery($coon, $sql))
+        if (mysqli_query($conn, $sql))
             header('location: /form_page.php');
         else
             echo "Error : " .mysqli_error($conn);
     }
-
 }
+ 
+include '/close_database.php';
